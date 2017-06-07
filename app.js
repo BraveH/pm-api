@@ -10,9 +10,8 @@ var monk = require('monk');
 var un = process.env.OPENSHIFT_MYSQL_DB_USERNAME;
 var pw = process.env.OPENSHIFT_MYSQL_DB_PASSWORD;
 var dbname = "pmdb";
-var host = process.env.OPENSHIFT_MYSQL_DB_HOST;
-var actualHost = host.substring(0, host.length-1);
-var port = process.env.OPENSHIFT_MYSQL_DB_PORT;
+var host = "172.30.49.107";//process.env.OPENSHIFT_MYSQL_DB_HOST;
+var port = "27017";//process.env.OPENSHIFT_MYSQL_DB_PORT;
 var db = monk(actualHost + ':' + port + '/' + dbname, {
   username : un,
   password : pw
