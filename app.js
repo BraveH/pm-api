@@ -7,14 +7,21 @@ var bodyParser = require('body-parser');
 
 var mongo = require('mongodb');
 var monk = require('monk');
-//var un = process.env.MONGODB_USER;
-//var pw = process.env.MONGODB_PASSWORD;
-//var dbname = process.env.MONGODB_DATABASE;
-//var host = process.env.OPENSHIFT_MONGODB_DB_HOST;
-//var port = process.env.OPENSHIFT_MONGODB_DB_PORT;
-var url = process.env.OPENSHIFT_MONGODB_DB_URL + process.env.MONGODB_DATABASE;
-console.log("url: ", url);
-var db = monk(url);
+var un = process.env.MONGODB_USER;
+var pw = process.env.MONGODB_PASSWORD;
+var dbname = process.env.MONGODB_DATABASE;
+var host = "127.0.0.1";
+var port = "27017";
+var connection_string = "mongodb://" + un + ":" + pw + "@" + host + ":" + port + "/" + dbname;
+//if(process.env.OPENSHIFT_MONGODB_DB_PASSWORD){
+//  connection_string = "mongodb://" + process.env.OPENSHIFT_MONGODB_DB_USERNAME + ":" +
+//  process.env.OPENSHIFT_MONGODB_DB_PASSWORD + "@" +
+//  process.env.OPENSHIFT_MONGODB_DB_HOST + ':' +
+//  process.env.OPENSHIFT_MONGODB_DB_PORT + '/' +
+//  process.env.MONGODB_DATABASE;
+//}
+console.log("url: ", connection_string);
+var db = monk(connection_string);
 
 var index = require('./routes/index');
 var api = require('./routes/api');
