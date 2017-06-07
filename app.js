@@ -7,21 +7,33 @@ var bodyParser = require('body-parser');
 
 var mongo = require('mongodb');
 var monk = require('monk');
-var un = process.env.MONGODB_USER;
-var pw = process.env.MONGODB_PASSWORD;
-var dbname = process.env.MONGODB_DATABASE;
-var host = "127.0.0.1";
-var port = "27017";
-var connection_string = "mongodb://" + un + ":" + pw + "@" + host + ":" + port + "/" + dbname;
-//if(process.env.OPENSHIFT_MONGODB_DB_PASSWORD){
-//  connection_string = "mongodb://" + process.env.OPENSHIFT_MONGODB_DB_USERNAME + ":" +
-//  process.env.OPENSHIFT_MONGODB_DB_PASSWORD + "@" +
-//  process.env.OPENSHIFT_MONGODB_DB_HOST + ':' +
-//  process.env.OPENSHIFT_MONGODB_DB_PORT + '/' +
-//  process.env.MONGODB_DATABASE;
-//}
-console.log("url: ", connection_string);
-var db = monk(connection_string);
+
+var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
+    ip   = process.env.IP   || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0',
+    mongoURL = process.env.OPENSHIFT_MONGODB_DB_URL || process.env.MONGO_URL,
+    mongoURLLabel = "";
+
+if (mongoURL == null && process.env.DATABASE_SERVICE_NAME) {
+  var mongoServiceName = process.env.DATABASE_SERVICE_NAME.toUpperCase(),
+      mongoHost = process.env[mongoServiceName + '_SERVICE_HOST'],
+      mongoPort = process.env[mongoServiceName + '_SERVICE_PORT'],
+      mongoDatabase = process.env[mongoServiceName + '_DATABASE'],
+      mongoPassword = process.env[mongoServiceName + '_PASSWORD']
+      mongoUser = process.env[mongoServiceName + '_USER'];
+
+  if (mongoHost && mongoPort && mongoDatabase) {
+    mongoURLLabel = mongoURL = 'mongodb://';
+    if (mongoUser && mongoPassword) {
+      mongoURL += mongoUser + ':' + mongoPassword + '@';
+    }
+    // Provide UI label that excludes user id and pw
+    mongoURLLabel += mongoHost + ':' + mongoPort + '/' + mongoDatabase;
+    mongoURL += mongoHost + ':' +  mongoPort + '/' + mongoDatabase;
+
+  }
+}
+
+var db = monk(mongoURL);
 
 var index = require('./routes/index');
 var api = require('./routes/api');
@@ -66,5 +78,8 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+app.listen(port, ip);
+console.log('Server running on http://%s:%s', ip, port);
 
 module.exports = app;
