@@ -7,7 +7,15 @@ var bodyParser = require('body-parser');
 
 var mongo = require('mongodb');
 var monk = require('monk');
-var db = monk('localhost:27017/pmdb');
+var un = process.env.OPENSHIFT_MYSQL_DB_USERNAME;
+var pw = process.env.OPENSHIFT_MYSQL_DB_PASSWORD;
+var dbname = "pmdb";
+var host = process.env.OPENSHIFT_MYSQL_DB_HOST;
+var port = process.env.OPENSHIFT_MYSQL_DB_PORT;
+var db = monk(host + ':' + port + '/' + dbname, {
+  username : un,
+  password : pw
+});
 
 var index = require('./routes/index');
 var api = require('./routes/api');
